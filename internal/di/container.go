@@ -14,6 +14,7 @@ func Register(r *gin.Engine, data *[]domain.User){
   userService := service.NewUserService(userRepo)
   userHandler := handler.NewUserHandler(userService)
 
-  r.POST("/users", userHandler.Create)
+  r.POST("/sign-up", userHandler.Create)
+  r.POST("/sign-in", userHandler.Login)
   r.GET("/users", userHandler.GetUsers)
 }

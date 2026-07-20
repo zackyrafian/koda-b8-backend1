@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type User struct { 
   Id int64
@@ -15,3 +17,13 @@ type CreateUserRequest struct {
   Password string `json:"password"`
 }
 
+type LoginRequest struct { 
+  Email string `json:"email"`
+  Password string `json:"password"`
+}
+
+
+// type Repository interface { 
+//   Create(req *CreateUserRequest) (*domain.User, error) 
+//   FindByEmail(req FindEmail) (*domain.User, error)
+// }
