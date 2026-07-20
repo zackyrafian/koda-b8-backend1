@@ -1,41 +1,44 @@
 package repository
 
 import (
-	"errors"
+	"context"
 	"koda-b8-backend1/internal/domain"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 
 type UserRepository struct {
-    data *[]domain.User
+    db *pgxpool.Pool
 }
 
-func NewUserRepository(data *[]domain.User) *UserRepository {
-    return &UserRepository{data: data}
+func NewUserRepository(db *pgxpool.Pool) *UserRepository {
+    return &UserRepository{db: db}
 }
 
-func (r *UserRepository) Create(req *domain.CreateUserRequest) (*domain.User, error) {
-    id := int64(len(*r.data) + 1)
-    user := domain.User{
-        Id: id,
-        Email:    req.Email,
-        Password: req.Password,
+func (r *UserRepository) Create(req *domain.CreateUserRequest, ctx context.Context) (*domain.User, error) {
+    var users domain.User
+    err := r.db.QueryRow(
+      ctx, `
+        INSERT INTO users (email, password) VALUES ($1, $2) RETURNING users.email, id
+      `, req.Email, req.Password, 
+    ).Scan(&users.Email, &users.Id)
+    if err != nil { 
+      return nil, err
     }
-    *r.data = append(*r.data, user)
-    return &user, nil
+    return &users, nil
 }
 
-func (r *UserRepository) FindAll() (*[]domain.User, error) { 
-  users := r.data
-  return users, nil
+func (r *UserRepository) FindAll(ctx context.Context) (*[]domain.User, error) { 
+  return nil, nil
 }
 
-func (r *UserRepository) FindByEmail(email string) (*domain.User, error) {
-	for _, user := range *r.data {
-		if user.Email == email {
-			return &user, nil
-		}
-	}
+// func (r *UserRepository) FindByEmail(email string) (*domain.User, error) {
+// 	for _, user := range *r.data {
+// 		if user.Email == email {
+// 			return &user, nil
+// 		}
+// 	}
 
-	return nil, errors.New("user tidak ditemukan")
-}
+// 	return nil, errors.New("user tidak ditemukan")
+// }

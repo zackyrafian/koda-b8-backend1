@@ -17,12 +17,13 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 }
 
 func (h *UserHandler) Create(c *gin.Context) { 
-  email := c.PostForm("email")
-  password := c.PostForm("password")
-  user, err := h.service.Create(&domain.CreateUserRequest{
-      Email:    email,
-      Password: password,
-  })
+  var form domain.CreateUserRequest
+  if err := c.ShouldBindJSON(&form); err != nil {
+    c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+    return
+  }
+ 
+  user, err := h.service.Create(&form, c.Request.Context())
   if err != nil {
       c.JSON(http.StatusBadRequest, gin.H{
           "message": err.Error(),
@@ -32,30 +33,30 @@ func (h *UserHandler) Create(c *gin.Context) {
   c.JSON(http.StatusCreated, user)
 }
 
-func (h *UserHandler) Login(c *gin.Context) { 
-  email := c.PostForm("email")
-  password := c.PostForm("password")
-  user, err := h.service.Login(&domain.LoginRequest{
-    Email: email,
-    Password: password,
-  })
+// func (h *UserHandler) Login(c *gin.Context) { 
+//   email := c.PostForm("email")
+//   password := c.PostForm("password")
+//   user, err := h.service.Login(&domain.LoginRequest{
+//     Email: email,
+//     Password: password,
+//   })
 
-  if err != nil { 
-    c.JSON(http.StatusBadRequest, gin.H{ 
-      "message": err.Error(),
-    })
-    return
-  }
-  c.JSON(http.StatusAccepted, user)
-}
+//   if err != nil { 
+//     c.JSON(http.StatusBadRequest, gin.H{ 
+//       "message": err.Error(),
+//     })
+//     return
+//   }
+//   c.JSON(http.StatusAccepted, user)
+// }
 
-func (h *UserHandler) GetUsers(c *gin.Context) { 
-  users, err := h.service.GetUsers()
-  if err != nil { 
-    c.JSON(http.StatusInternalServerError, gin.H{ 
-      "message": "error",
-    })
-    return 
-  }
-  c.JSON(http.StatusOK, users)
-}
+// func (h *UserHandler) GetUsers(c *gin.Context) { 
+//   users, err := h.service.GetUsers()
+//   if err != nil { 
+//     c.JSON(http.StatusInternalServerError, gin.H{ 
+//       "message": "error",
+//     })
+//     return 
+//   }
+//   c.JSON(http.StatusOK, users)
+// }

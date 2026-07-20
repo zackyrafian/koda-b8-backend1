@@ -22,8 +22,7 @@ type LoginRequest struct {
   Password string `json:"password"`
 }
 
-
 // type Repository interface { 
-//   Create(req *CreateUserRequest) (*domain.User, error) 
-//   FindByEmail(req FindEmail) (*domain.User, error)
+//   Create(ctx context.Context ,req *CreateUserRequest) (*User, error) 
+//   FindByEmail(ctx context.Context, req *LoginRequest) (*User, error)
 // }
